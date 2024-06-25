@@ -1,30 +1,30 @@
-name: Announce LTS RCs
-
-on:
-  release:
-    types: [prereleased]
-
 jobs:
   post:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - name: Post on Discourse
-        uses: roots/discourse-topic-github-release-action@c30dc233349b7c6f24f52fb1c659cc64f13b5474 # v1.0.1
-        with:
-          discourse-api-key: ${{ secrets.DISCOURSE_RELEASES_API_KEY }}
-          discourse-base-url: https://community.jenkins.io/
-          discourse-author-username: jenkins-release-bot
-          discourse-category: 23
-      - name: Post on mailing list
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{secrets.MAIL_USERNAME}}
-          password: ${{secrets.MAIL_PASSWORD}}
-          secure: true
-          subject: ${{ github.event.release.tag_name }} has been released
-          to: jenkinsci-dev@googlegroups.com
-          from: Jenkins Release Bot
-          html_body: ${{ github.event.release.body }}
-          convert_markdown: true
+    - continue-on-error: true
+      name: Post on Discourse
+      uses: roots/discourse-topic-github-release-action@c30dc233349b7c6f24f52fb1c659cc64f13b5474
+      with:
+        discourse-api-key: ${{ secrets.DISCOURSE_RELEASES_API_KEY }}
+        discourse-author-username: jenkins-release-bot
+        discourse-base-url: https://community.jenkins.io/
+        discourse-category: 23
+    - continue-on-error: true
+      name: Post on mailing list
+      uses: dawidd6/action-send-mail@v3
+      with:
+        convert_markdown: true
+        from: Jenkins Release Bot
+        html_body: ${{ github.event.release.body }}
+        password: ${{secrets.MAIL_PASSWORD}}
+        secure: true
+        server_address: smtp.gmail.com
+        server_port: 465
+        subject: ${{ github.event.release.tag_name }} has been released
+        to: jenkinsci-dev@googlegroups.com
+        username: ${{secrets.MAIL_USERNAME}}
+name: Announce LTS RCs
+on:
+  repository_dispatch:
+    types: trigger-ga___announce-lts-rc.yml

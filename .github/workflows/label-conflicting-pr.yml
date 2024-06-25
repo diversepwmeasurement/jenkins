@@ -1,21 +1,20 @@
-name: "Label conflicting PRs"
-on:
-  push:
-  pull_request_target:
-    types: [synchronize]
-
-permissions:
-  pull-requests: write
-
 jobs:
   main:
     if: github.event.pull_request.user.login != 'dependabot[bot]'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - name: Label conflicting PRs
-        uses: eps1lon/actions-label-merge-conflict@v3.0.2
-        with:
-          dirtyLabel: "unresolved-merge-conflict"
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          commentOnDirty: "Please take a moment and address the merge conflicts of your pull request. Thanks!"
-          continueOnMissingPermissions: true
+    - continue-on-error: true
+      name: Label conflicting PRs
+      uses: eps1lon/actions-label-merge-conflict@v3.0.2
+      with:
+        commentOnDirty: Please take a moment and address the merge conflicts of your
+          pull request. Thanks!
+        continueOnMissingPermissions: true
+        dirtyLabel: unresolved-merge-conflict
+        repoToken: ${{ secrets.GITHUB_TOKEN }}
+name: Label conflicting PRs
+on:
+  repository_dispatch:
+    types: trigger-ga___label-conflicting-pr.yml
+permissions:
+  pull-requests: write
